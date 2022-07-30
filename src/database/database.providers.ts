@@ -1,4 +1,3 @@
-import { User } from 'src/user/entity/user.entity';
 import { DataSource } from 'typeorm';
 
 export const databaseProviders = [

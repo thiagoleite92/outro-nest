@@ -15,6 +15,12 @@ import { IUserController } from './interface/user-controller.interface';
 export class UserController implements IUserController {
   constructor(private userService: UserService) {}
 
+  @Post('create')
+  async create(@Body() createUserDto: CreateUserDto): Promise<any> {
+    const response = this.userService.create(createUserDto);
+    return response;
+  }
+
   @Get('list/:id')
   async listOne(@Param('id') id: ListUserDto): Promise<any> {
     const response = this.userService.listOne(id);
@@ -28,12 +34,6 @@ export class UserController implements IUserController {
     return response;
   }
 
-  @Post('create')
-  async create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    const response = this.userService.create(createUserDto);
-    return response;
-  }
-
   @Put('edit/:id')
   findAndUpdate(@Param('id') id: string, @Body() update: any): Promise<any> {
     const response = this.userService.findAndUpdate(+id, update);
@@ -43,7 +43,7 @@ export class UserController implements IUserController {
 
   @Delete('delete/:id')
   async remove(@Param('id') id: ListUserDto): Promise<any> {
-    const response = this.userService.remove(+id);
+    const response = this.userService.remove(id);
     return response;
   }
 }
