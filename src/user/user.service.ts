@@ -1,12 +1,7 @@
 import { UserType } from './types/user.type';
-import { UpdateCourseDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entity/user.entity';
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto';
 import { IUserService } from './interface';
@@ -30,38 +25,38 @@ export class UserService implements IUserService {
     return { name, email, id: newUser.identifiers[0].id };
   }
 
-  async listOne(id: number): Promise<UserType> {
+  async listOne(id: number): Promise<any> {
     const user = await this.userRepository.findOne({
-      where: { id: +id },
+      where: { id },
+      select: ['name', 'email', 'id'],
     });
 
     if (!user) {
-      throw new NotFoundException(`user ${id} not found`);
+      throw new NotFoundException(`Usuário com ID: ${id}, não foi encontrado`);
     }
 
     return user;
   }
 
   async listAll(): Promise<Array<UserType>> {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({ select: ['name', 'email'] });
 
     return users;
   }
 
-  async findAndUpdate(id: number, update: UpdateCourseDto): Promise<any> {
-    const user = await this.listOne(id);
+  async findAndUpdate(id: number, update: UpdateUserDto): Promise<any> {
+    const { email, name } = update;
+    await this.listOne(id);
 
-    user.name = update.name;
+    await this.userRepository.update(id, { email, name });
 
-    console.log(user, 'aqui');
-
-    return user;
+    return { message: 'Usuário atualizado com sucesso' };
   }
 
   async remove(id: number): Promise<void> {
     const user = await this.listOne(id);
 
-    await this.userRepository.delete(user);
+    await this.userRepository.remove(user);
 
     return;
   }

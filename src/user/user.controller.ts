@@ -1,3 +1,4 @@
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserType } from './types/user.type';
 import { UserService } from './user.service';
 import {
@@ -6,6 +7,8 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -26,37 +29,65 @@ export class UserController implements IUserController {
     } catch (error) {
       console.log(error);
 
-      if (error.errono === 1062) {
+      if (error.errno === 1062) {
         throw new ConflictException('Email já cadastrado');
       }
 
-      return 'Cadê o email?';
+      throw new InternalServerErrorException(
+        'Algo deu errado! Tente novamente mais tarde',
+      );
     }
   }
 
   @Get('list/:id')
   async listOne(@Param('id') id: number): Promise<UserType> {
-    const response = this.userService.listOne(+id);
+    const response = await this.userService.listOne(id);
+
     return response;
   }
 
   @Get('list')
   async listAll(): Promise<Array<UserType>> {
-    const response = await this.userService.listAll();
+    try {
+      const response = await this.userService.listAll();
 
-    return response;
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Algo deu errado! Tente novamente mais tarde',
+      );
+    }
   }
 
   @Put('edit/:id')
-  findAndUpdate(@Param('id') id: string, @Body() update: any): Promise<any> {
-    const response = this.userService.findAndUpdate(+id, update);
+  async findAndUpdate(
+    @Param('id') id: number,
+    @Body() update: UpdateUserDto,
+  ): Promise<any> {
+    try {
+      const response = await this.userService.findAndUpdate(id, update);
 
-    return response;
+      return response;
+    } catch (error) {
+      if (error.errno === 1062) {
+        throw new ConflictException('Email já cadastrado');
+      }
+
+      throw new InternalServerErrorException(
+        'Algo deu errado! Tente novamente mais tarde',
+      );
+    }
   }
 
   @Delete('delete/:id')
-  async remove(@Param('id') id: string): Promise<any> {
-    const response = this.userService.remove(+id);
-    return response;
+  async remove(@Param('id') id: number): Promise<any> {
+    try {
+      const response = await this.userService.remove(id);
+
+      return response;
+    } catch (error) {
+      throw new NotFoundException(`Usuário com ID: ${id}, não foi encontrado`);
+    }
   }
 }

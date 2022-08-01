@@ -5,6 +5,6 @@ export interface IUserController {
   create(createUserDto: CreateUserDto): Promise<any>;
   listOne(id: number): Promise<UserType>;
   listAll(): Promise<Array<UserType>>;
-  remove(id: string): Promise<void>;
+  remove(id: number): Promise<void>;
   // update(id, updateUserDto): string;
 }
