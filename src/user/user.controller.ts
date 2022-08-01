@@ -1,6 +1,8 @@
+import { UserType } from './types/user.type';
 import { UserService } from './user.service';
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -8,7 +10,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CreateUserDto, ListUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { IUserController } from './interface/user-controller.interface';
 
 @Controller('user')
@@ -17,19 +19,30 @@ export class UserController implements IUserController {
 
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto): Promise<any> {
-    const response = this.userService.create(createUserDto);
-    return response;
+    try {
+      const newUser = await this.userService.create(createUserDto);
+
+      return newUser;
+    } catch (error) {
+      console.log(error);
+
+      if (error.errono === 1062) {
+        throw new ConflictException('Email já cadastrado');
+      }
+
+      return 'Cadê o email?';
+    }
   }
 
   @Get('list/:id')
-  async listOne(@Param('id') id: ListUserDto): Promise<any> {
-    const response = this.userService.listOne(id);
+  async listOne(@Param('id') id: number): Promise<UserType> {
+    const response = this.userService.listOne(+id);
     return response;
   }
 
   @Get('list')
-  async listAll(): Promise<string> {
-    const response = this.userService.listAll();
+  async listAll(): Promise<Array<UserType>> {
+    const response = await this.userService.listAll();
 
     return response;
   }
@@ -42,8 +55,8 @@ export class UserController implements IUserController {
   }
 
   @Delete('delete/:id')
-  async remove(@Param('id') id: ListUserDto): Promise<any> {
-    const response = this.userService.remove(id);
+  async remove(@Param('id') id: string): Promise<any> {
+    const response = this.userService.remove(+id);
     return response;
   }
 }

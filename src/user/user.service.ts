@@ -1,29 +1,36 @@
+import { UserType } from './types/user.type';
+import { UpdateCourseDto } from './dto/update-user.dto';
 import { User } from './entity/user.entity';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { CreateUserDto, ListUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import { IUserService } from './interface';
 
 @Injectable()
 export class UserService implements IUserService {
-  private users: Array<any>;
   constructor(
     @Inject('user_repository')
     private userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {
-    try {
-      const user = await this.userRepository.insert(createUserDto);
+    const { name, email, password } = createUserDto;
 
-      return user;
-    } catch (e) {
-      console.log(e);
-      return 'deu erro';
-    }
+    const newUser = await this.userRepository.insert({
+      name,
+      email,
+      password,
+    });
+
+    return { name, email, id: newUser.identifiers[0].id };
   }
 
-  async listOne(id: ListUserDto) {
+  async listOne(id: number): Promise<UserType> {
     const user = await this.userRepository.findOne({
       where: { id: +id },
     });
@@ -35,12 +42,14 @@ export class UserService implements IUserService {
     return user;
   }
 
-  listAll(): any {
-    return this.users;
+  async listAll(): Promise<Array<UserType>> {
+    const users = await this.userRepository.find();
+
+    return users;
   }
 
-  findAndUpdate(id: number, update: any): Promise<any> {
-    const user = this.users.find((user) => user.id === +id);
+  async findAndUpdate(id: number, update: UpdateCourseDto): Promise<any> {
+    const user = await this.listOne(id);
 
     user.name = update.name;
 
@@ -49,10 +58,10 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async remove(id: ListUserDto): Promise<any> {
+  async remove(id: number): Promise<void> {
     const user = await this.listOne(id);
 
-    await this.userRepository.remove(user);
+    await this.userRepository.delete(user);
 
     return;
   }

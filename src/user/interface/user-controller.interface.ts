@@ -1,9 +1,10 @@
-import { CreateUserDto, ListUserDto } from './../dto/';
+import { UserType } from '../types/user.type';
+import { CreateUserDto } from './../dto/';
 
 export interface IUserController {
   create(createUserDto: CreateUserDto): Promise<any>;
-  listOne(id: ListUserDto): Promise<any>;
-  listAll(): Promise<any>;
-  // delete(id): string;
+  listOne(id: number): Promise<UserType>;
+  listAll(): Promise<Array<UserType>>;
+  remove(id: string): Promise<void>;
   // update(id, updateUserDto): string;
 }
