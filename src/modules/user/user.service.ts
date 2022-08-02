@@ -9,7 +9,7 @@ import { IUserService } from './interface';
 @Injectable()
 export class UserService implements IUserService {
   constructor(
-    @Inject('user_repository')
+    @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
   ) {}
 

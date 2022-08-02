@@ -3,7 +3,7 @@ import { User } from './entity/user.entity';
 
 export const UserProviders = [
   {
-    provide: 'user_repository',
+    provide: 'USER_REPOSITORY',
     useFactory: (dataSource: DataSource) => dataSource.getRepository(User),
     inject: ['DATA_SOURCE'],
   },
