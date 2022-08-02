@@ -45,10 +45,9 @@ export class UserService implements IUserService {
   }
 
   async findAndUpdate(id: number, update: UpdateUserDto): Promise<any> {
-    const { email, name } = update;
     await this.listOne(id);
 
-    await this.userRepository.update(id, { email, name });
+    await this.userRepository.update(id, update);
 
     return { message: 'Usuário atualizado com sucesso' };
   }

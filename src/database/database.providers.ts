@@ -1,4 +1,7 @@
+import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+
+const configService = new ConfigService();
 
 export const databaseProviders = [
   {
@@ -6,14 +9,13 @@ export const databaseProviders = [
     useFactory: async () => {
       const dataSource = new DataSource({
         type: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: 'thiago159',
-        database: 'nest-api',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
         entities: ['./dist/**/*.entity.js'],
         synchronize: true,
-        logging: true,
       });
 
       return dataSource.initialize();
