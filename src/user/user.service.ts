@@ -59,4 +59,15 @@ export class UserService implements IUserService {
 
     return;
   }
+
+  async findByEmail(email: string): Promise<any> {
+    const user = await this.userRepository.find({
+      where: { email },
+      select: ['name', 'email', 'id'],
+    });
+
+    if (!user) return null;
+
+    return user;
+  }
 }

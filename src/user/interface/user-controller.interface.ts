@@ -1,6 +1,6 @@
-import { UpdateUserDto } from './../dto/update-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserType } from '../types/user.type';
-import { CreateUserDto } from './../dto/';
+import { CreateUserDto } from '../dto';
 
 export interface IUserController {
   create(createUserDto: CreateUserDto): Promise<any>;

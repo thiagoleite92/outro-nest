@@ -1,5 +1,5 @@
-import { UserType } from './../types/user.type';
-import { CreateUserDto } from './../dto/';
+import { UserType } from '../types/user.type';
+import { CreateUserDto } from '../dto';
 
 export interface IUserService {
   create(createUserDto: CreateUserDto): Promise<string>;
